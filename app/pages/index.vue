@@ -1,11 +1,19 @@
 <script setup lang="ts">
 useHead({ title: "Users" });
 
-const searchInput = ref("");
-const debouncedSearch = ref("");
-const page = ref(1);
+const route = useRoute();
+const router = useRouter();
+
+const searchInput = ref(String(route.query.q ?? ""));
+const debouncedSearch = ref(String(route.query.q ?? ""));
+const page = ref(Number(route.query.page) || 1);
 const sorting = ref<{ id: string; desc: boolean }[]>([]);
 const limit = 10;
+
+const initialSort = String(route.query.sort ?? "");
+if (initialSort) {
+  sorting.value = [{ id: initialSort, desc: route.query.order === "desc" }];
+}
 
 const skip = computed(() => (page.value - 1) * limit);
 const sortBy = computed(() => sorting.value[0]?.id);
@@ -20,13 +28,37 @@ const { data, status } = await useFetch("/api/users", {
 
 let timer: ReturnType<typeof setTimeout>;
 
-watch(searchInput, (nilaiBaru) => {
+watch(searchInput, (newValue) => {
   clearTimeout(timer);
   timer = setTimeout(() => {
-    debouncedSearch.value = nilaiBaru;
+    debouncedSearch.value = newValue;
     page.value = 1;
   }, 400);
 });
+
+watch([debouncedSearch, page], () => {
+  router.replace({
+    query: {
+      ...route.query,
+      q: debouncedSearch.value || undefined,
+      page: page.value > 1 ? page.value : undefined,
+    },
+  });
+});
+
+watch(
+  sorting,
+  (val) => {
+    router.replace({
+      query: {
+        ...route.query,
+        sort: val[0]?.id ?? undefined,
+        order: val[0] ? (val[0].desc ? "desc" : "asc") : undefined,
+      },
+    });
+  },
+  { deep: true },
+);
 
 const columns = [
   sortableColumn("id", "ID", "w-20"),
@@ -56,7 +88,6 @@ const columns = [
         </div>
 
         <UBadge color="neutral" variant="subtle" size="lg" class="w-fit">
-          <UIcon name="i-lucide-hash" class="size-3.5" />
           {{ data?.total }} hasil
         </UBadge>
       </div>
@@ -91,7 +122,7 @@ const columns = [
             base: 'table-fixed',
             th: 'border-r border-default last:border-r-0',
             td: 'border-r border-default last:border-r-0',
-            tr: 'hover:bg-muted/50',
+            tr: 'hover:bg-muted/50 first:hover:bg-transparent',
           }"
           class="rounded-lg"
         >
