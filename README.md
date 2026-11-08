@@ -1,75 +1,49 @@
-# Nuxt Minimal Starter
+# API Fetch & UTable Practice (Nuxt 4)
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+A small practice project to learn how to fetch API data in Nuxt 4 and display it with Nuxt UI's `UTable`.
+
+## Overview
+
+- **Server API route** (`server/api/users.get.ts`) proxies requests to [DummyJSON](https://dummyjson.com/users), maps the response to a simpler shape, and returns `{ users, total }`.
+- **User page** (`app/pages/index.vue`) fetches `/api/users` with `useFetch`, showing a searchable, sortable, and paginated table.
+- **Search** is debounced (400ms) and resets the page to 1.
+- **Sorting** is done on the server (`manualSorting: true`), so the table only sends the sort state to the API.
+- **Pagination** uses `UPagination` with 10 items per page.
+- **URL sync** keeps `q`, `page`, `sort`, and `order` in the query string, so the table state can be shared or reloaded.
+- **Types** for the API response and mapped user live in `shared/types/user.ts`.
+- **`sortableColumn()`** helper (`app/utils/sortableColumn.ts`) builds sortable table columns with sort icons.
+
+## Tech Stack
+
+- Nuxt 4
+- Nuxt UI 4
+- Tailwind CSS 4
+- DummyJSON (external API)
 
 ## Setup
 
-Make sure to install dependencies:
+Install dependencies:
 
 ```bash
-# npm
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
 ## Development Server
 
-Start the development server on `http://localhost:3000`:
+Start the dev server on `http://localhost:3000`:
 
 ```bash
-# npm
 npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
-
-Build the application for production:
+## Build
 
 ```bash
-# npm
 npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
 ```
 
-Locally preview production build:
+Preview the production build locally:
 
 ```bash
-# npm
 npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
 ```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
